@@ -1,0 +1,48 @@
+version: '3'
+services:
+
+    postgres:
+        image: postgres
+        environment:
+            POSTGRES_PASSWORD: "admin123"
+        container_name: postgres
+        volumes: 
+            - ./.postgres:/var/lib/postgresql/data
+        ports:
+            - "5432"
+        networks: 
+            - rails-dev
+
+    pgadmin:
+        image: dpage/pgadmin4
+        environment:
+            PGADMIN_DEFAULT_EMAIL: "ray.evaf@gmail.com"
+            PGADMIN_DEFAULT_PASSWORD: "admin2020"
+        container_name: pgadmin
+        ports:
+            - "80:80"
+        networks: 
+            - rails-dev
+        depends_on: 
+            - "postgres"
+            - "rails"
+
+    rails:
+        build:
+            dockerfile: ./Docker/ruby.dockerfile
+            context: .
+        image: ruby
+        container_name: ruby-on-rails
+        volumes: 
+            - ./:/var/www
+        ports:
+            - "3000:3000"
+        networks: 
+            - rails-dev
+        depends_on: 
+            - "postgres"
+        tty: true
+
+networks: 
+    rails-dev:
+        driver: bridge
